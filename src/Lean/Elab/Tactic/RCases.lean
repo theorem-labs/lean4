@@ -405,6 +405,7 @@ partial def RCasesPatt.parse (stx : Syntax) : MetaM RCasesPatt :=
 def generalizeExceptFVar (goal : MVarId) (args : Array GeneralizeArg) :
     MetaM (Array Expr × Array FVarId × MVarId) := do
   let argsToGeneralize := args.filter fun arg => !(arg.expr.isFVar && arg.hName?.isNone)
+  if argsToGeneralize.isEmpty then return (args.map (·.expr), #[], goal)
   let (fvarIdsNew, goal) ← goal.generalize argsToGeneralize
   let mut result := #[]
   let mut j := 0
