@@ -291,6 +291,12 @@ jobs:
         with:
           name: build-${{ matrix.name }}
           path: pack/*
+          # Nothing reads this artifact after the run that produces it: the `release` and
+          # `release-nightly` jobs of `ci.yml` `needs: build` and download it in the same run.
+          # The cross-run readers in the workflows, `pr-release.yml` and `grove.yml`, are gated
+          # on `github.repository == 'leanprover/lean4'`, so neither runs in a fork. One day
+          # therefore pins the lifetime of a ~770 MB upload instead of inheriting the default.
+          retention-days: 1
       - name: Lean stats
         run: |
           build/$TARGET_STAGE/bin/lean --stats src/Lean.lean
